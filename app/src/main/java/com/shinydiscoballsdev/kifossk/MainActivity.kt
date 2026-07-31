@@ -1,0 +1,168 @@
+package com.shinydiscoballsdev.kifossk
+
+import android.annotation.SuppressLint
+import android.content.Context
+import android.content.Intent
+import android.net.ConnectivityManager
+import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.view.GestureDetector
+import android.view.MotionEvent
+import android.view.View
+import android.view.WindowManager
+import android.webkit.WebView
+import android.webkit.WebViewClient
+import androidx.appcompat.app.AppCompatActivity
+
+@SuppressLint("SetJavaScriptEnabled")
+class MainActivity : AppCompatActivity() {
+
+    private lateinit var webView: WebView
+    private lateinit var gestureDetector: GestureDetector
+    private var lastTouchX = 0f
+    private var lastTouchY = 0f
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        // Wake screen and show over lockscreen (API 27+)
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O_MR1) {
+            setShowWhenLocked(true)
+            setTurnScreenOn(true)
+        } else {
+            @Suppress("DEPRECATION")
+            window.addFlags(
+                WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED or
+                        WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON or
+                        WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD
+            )
+        }
+
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+
+        val prefs = getSharedPreferences("kiosk_prefs", MODE_PRIVATE)
+        val isFirstRun = prefs.getBoolean("first_run", true)
+
+        if (isFirstRun) {
+            prefs.edit().putBoolean("first_run", false).commit()
+            startActivity(Intent(this, SettingsActivity::class.java))
+            finish()
+        } else {
+            setupWebView()
+        }
+    }
+
+    @SuppressLint("SetJavaScriptEnabled", "MissingPermission")
+    private fun setupWebView() {
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+
+        val prefs = getSharedPreferences("kiosk_prefs", MODE_PRIVATE)
+        val url = prefs.getString("web_url", "http://192.168.50.152:3001") ?: "http://192.168.50.152:3001"
+        val orientation = prefs.getString("orientation", "landscape") ?: "landscape"
+
+        when (orientation) {
+            "landscape" -> requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+            "portrait" -> requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+            "auto" -> requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+        }
+
+        hideSystemUI()
+
+        webView = WebView(this)
+        webView.setBackgroundColor(android.graphics.Color.parseColor("#1a1a2e"))
+        webView.settings.apply {
+            javaScriptEnabled = true
+            domStorageEnabled = true
+            builtInZoomControls = false
+            useWideViewPort = true
+            loadWithOverviewMode = true
+        }
+        webView.webViewClient = WebViewClient()
+        setContentView(webView)
+
+        // Gesture detector - pass this directly
+        gestureDetector = GestureDetector(this, object : GestureDetector.SimpleOnGestureListener() {
+            override fun onLongPress(e: MotionEvent) {
+                startActivity(Intent(this@MainActivity, SettingsActivity::class.java))
+            }
+        })
+
+        // Network check
+        val isConnected = try {
+            val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            @Suppress("DEPRECATION")
+            connectivityManager.activeNetworkInfo?.isConnected == true
+        } catch (e: Exception) {
+            false
+        }
+
+        if (isConnected) {
+            webView.loadUrl(url)
+        } else {
+            loadWaitingPage(url)
+        }
+    }
+
+    @Suppress("DEPRECATION")
+    private fun hideSystemUI() {
+        window.decorView.systemUiVisibility = (
+                View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY or
+                        View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
+                        View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION or
+                        View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
+                        View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or
+                        View.SYSTEM_UI_FLAG_FULLSCREEN
+                )
+    }
+
+    override fun dispatchTouchEvent(event: MotionEvent?): Boolean {
+        if (event != null) {
+            gestureDetector.onTouchEvent(event)
+        }
+        return super.dispatchTouchEvent(event)
+    }
+
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        if (hasFocus) {
+            hideSystemUI()
+        }
+    }
+
+    @Deprecated("Deprecated in Java")
+    override fun onBackPressed() {
+        // Do nothing
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun loadWaitingPage(targetUrl: String) {
+        val waitingHtml = "<html><head><style>" +
+                "body{background-color:#1a1a2e;color:#6d4aff;text-align:center;" +
+                "font-family:sans-serif;padding-top:35%;margin:0;}" +
+                "h2{font-size:28px;}" +
+                "</style></head><body>" +
+                "<h2>Loading...</h2>" +
+                "<p style=\"color:#888;font-size:14px;\">Connecting to network</p>" +
+                "</body></html>"
+
+        webView.setBackgroundColor(android.graphics.Color.parseColor("#1a1a2e"))
+        webView.loadDataWithBaseURL(null, waitingHtml, "text/html", "UTF-8", null)
+
+        Handler(Looper.getMainLooper()).postDelayed({
+            val isConnected = try {
+                val cm = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+                @Suppress("DEPRECATION")
+                cm.activeNetworkInfo?.isConnected == true
+            } catch (e: Exception) {
+                false
+            }
+
+            if (isConnected) {
+                webView.loadUrl(targetUrl)
+            } else {
+                loadWaitingPage(targetUrl)
+            }
+        }, 3000)
+    }
+}

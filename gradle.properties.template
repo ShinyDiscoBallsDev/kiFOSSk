@@ -1,0 +1,3 @@
+kifossk.storePassword=YOUR_STORE_PASSWORD_HERE
+kifossk.keyAlias=kifossk_key
+kifossk.keyPassword=YOUR_KEY_PASSWORD_HERE

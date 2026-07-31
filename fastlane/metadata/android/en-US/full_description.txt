@@ -1,0 +1,14 @@
+kiFOSSk is a lightweight, open-source kiosk browser designed to turn your Android device into a dedicated display for remote dashboards. Whether you're monitoring ADS-B flights, viewing Home Assistant dashboards, or running digital signage, kiFOSSk provides a reliable, privacy-first solution.
+
+Key Features:
+• Home Launcher Mode: Automatically starts on boot without complex Device Owner setup.
+• Privacy Focused: Zero Google Play Services, no analytics, no telemetry.
+• Customizable: Set dashboard URL, orientation, and screen timeout.
+• Battery Optimized: Includes a built-in dialog to request unrestricted battery usage.
+• Secure: Minimal permissions, local storage only, connects only to your configured URL.
+
+Perfect for GrapheneOS users and privacy-conscious homelab enthusiasts.
+
+Setup is simple: Install, enter your dashboard URL, enable boot autostart, and set as the default home app. No root, no bloatware, just a clean kiosk experience.
+
+This project is maintained by ShinyDiscoBallsDev and licensed under the MIT License.

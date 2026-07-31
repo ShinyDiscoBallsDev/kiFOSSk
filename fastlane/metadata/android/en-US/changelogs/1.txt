@@ -1,0 +1,1 @@
+Initial release of kiFOSSk v1.0. Features Home Launcher mode, lockscreen bypass, customizable settings, and privacy-first design.

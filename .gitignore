@@ -1,0 +1,16 @@
+# Secrets
+*.keystore
+*.jks
+gradle.properties
+local.properties
+
+# Build artifacts
+build/
+.gradle/
+
+# IDE
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
