@@ -3,6 +3,7 @@
 *.jks
 gradle.properties
 local.properties
+DEVELOPMENT.md
 
 # Build artifacts
 build/
