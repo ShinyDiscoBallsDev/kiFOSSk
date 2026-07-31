@@ -1,11 +1,9 @@
 # kiFOSSk Development Notes
 
-*Internal use only — NOT PUBLISHED TO GITHUB*
+
 
 ## Recent Changes
-- [Your internal dev notes here]
-- [Refactoring tasks]
-- [Bug tracking]
+
 
 ## Local Build Commands
 
