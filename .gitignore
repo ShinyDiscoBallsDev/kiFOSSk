@@ -1,7 +1,6 @@
 # Secrets
 *.keystore
 *.jks
-gradle.properties
 local.properties
 DEVELOPMENT.md
 
