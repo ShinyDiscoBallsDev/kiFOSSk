@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -25,10 +27,16 @@ android {
 
     signingConfigs {
         create("release") {
-            storeFile = file("../kiFOSSk.keystore")
-            storePassword = project.property("kifossk.storePassword") as String
-            keyAlias = project.property("kifossk.keyAlias") as String
-            keyPassword = project.property("kifossk.keyPassword") as String
+            storeFile = file("../kiFOSSk-new.keystore")
+
+            val localProps = Properties()
+            rootProject.file("local.properties").inputStream().use { input ->
+                localProps.load(input)
+            }
+
+            storePassword = localProps.getProperty("kifossk_key.storePassword", "")
+            keyAlias = localProps.getProperty("kifossk_key.keyAlias", "kifoss_key")
+            keyPassword = localProps.getProperty("kifossk_key.keyPassword", "")
         }
     }
 
