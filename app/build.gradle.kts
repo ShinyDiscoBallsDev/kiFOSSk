@@ -9,6 +9,11 @@ android {
     namespace = "com.shinydiscoballsdev.kifossk"
     compileSdk = 34
 
+    dependenciesInfo {
+        includeInApk = false
+        includeInBundle = false
+    }
+
     defaultConfig {
         applicationId = "com.shinydiscoballsdev.kifossk"
         minSdk = 24
