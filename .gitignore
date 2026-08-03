@@ -14,3 +14,8 @@ build/
 # OS files
 .DS_Store
 Thumbs.db
+
+# Testing
+app/src/test/
+app/src/androidTest/
+*.test.local.properties

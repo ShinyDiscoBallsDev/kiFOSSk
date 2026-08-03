@@ -16,6 +16,7 @@ import android.net.Uri
 import android.provider.Settings
 import android.content.pm.PackageManager
 import androidx.appcompat.widget.SwitchCompat
+import com.shinydiscoballsdev.kifossk.KioskPrefs
 
 class SettingsActivity : AppCompatActivity() {
 
@@ -47,11 +48,9 @@ class SettingsActivity : AppCompatActivity() {
         textLauncherStatus = findViewById(R.id.textLauncherStatus)
 
         // Load existing preferences
-        val prefs = getSharedPreferences("kiosk_prefs", MODE_PRIVATE)
-
-        editTextUrl.setText(prefs.getString("web_url", "http://192.168.50.152:3001"))
-        switchScreenOn.isChecked = prefs.getBoolean("screen_on", true)
-        switchBootAutostart.isChecked = prefs.getBoolean("boot_autostart", false)
+        editTextUrl.setText(KioskPrefs.getUrl(this))
+        switchScreenOn.isChecked = KioskPrefs.getInstance(this).getBoolean("screen_on", true)
+        switchBootAutostart.isChecked = KioskPrefs.getInstance(this).getBoolean("boot_autostart", false)
 
         // Toggle listener for boot autostart
         switchBootAutostart.setOnCheckedChangeListener { _, isChecked ->
@@ -95,7 +94,7 @@ class SettingsActivity : AppCompatActivity() {
      */
     private fun setAsLauncher() {
         // Save current settings before leaving (defensive)
-        val prefs = getSharedPreferences("kiosk_prefs", MODE_PRIVATE)
+        val prefs = KioskPrefs.getInstance(this)
         prefs.edit()
             .putString("web_url", editTextUrl.text.toString())
             .putBoolean("screen_on", switchScreenOn.isChecked)
@@ -145,7 +144,7 @@ class SettingsActivity : AppCompatActivity() {
     override fun onPause() {
         super.onPause()
         // Save preferences when activity loses focus (defensive backup)
-        val prefs = getSharedPreferences("kiosk_prefs", MODE_PRIVATE)
+        val prefs = KioskPrefs.getInstance(this)
         val editor = prefs.edit()
         editor.putString("web_url", editTextUrl.text.toString())
         editor.putBoolean("screen_on", switchScreenOn.isChecked)
@@ -157,14 +156,14 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     private fun saveAndReturn() {
-        val prefs = getSharedPreferences("kiosk_prefs", MODE_PRIVATE)
+        val prefs = KioskPrefs.getInstance(this)
         val editor = prefs.edit()
 
         editor.putString("web_url", editTextUrl.text.toString())
         editor.putBoolean("screen_on", switchScreenOn.isChecked)
         editor.putBoolean("boot_autostart", switchBootAutostart.isChecked)
 
-        // Map orientation selection
+// Map orientation selection
         val orientationIndex = spinnerOrientation.selectedItemPosition
         val orientationMap = mapOf(
             0 to "landscape",
@@ -172,6 +171,9 @@ class SettingsActivity : AppCompatActivity() {
             2 to "auto"
         )
         editor.putString("orientation", orientationMap[orientationIndex])
+
+// FIX Bug #4: Clear first_run only after URL is validated and saved
+        editor.putBoolean("first_run", false)
 
         val success = editor.commit()
 
