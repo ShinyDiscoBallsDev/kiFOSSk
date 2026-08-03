@@ -38,7 +38,15 @@ Coming soon! Once reviewed, install directly from [F-Droid](https://f-droid.org)
 5. Open the app, configure your dashboard URL in Settings.
 6. Tap "Set as Home Launcher" when prompted (or go to Settings > Apps > Default Apps > Home App).
 
-**Note**: Google Play Protect may warn about "unauthorized developer" when installing. This is expected behavior for sideloaded apps. Tap "Install anyway" to proceed.
+**Note**: Google Play Protect may warn about "unauthorized developer" when installing. This is expected for sideloaded apps — kiFOSSk is not signed by a Google-certified certificate authority. The app contains no malicious code. Tap "Install anyway" to proceed.
+
+**Samsung / One UI users**: Play Protect is especially aggressive on Samsung devices due to Knox integration. If installation is silently blocked:
+1. Open **Google Play Store** → Menu → **Play Protect**
+2. Tap **Scan**
+3. If kiFOSSk appears under "Harmful apps found," tap **Details** → **Allow anyway**
+4. Retry the APK installation
+
+This does not happen on OxygenOS, Pixel, or GrapheneOS — those platforms show the "Install anyway" button directly.
 
 ### Option C: Build from Source
 
@@ -130,6 +138,7 @@ Samsung's One UI has the most aggressive background restrictions.
  - Put Apps to Sleep: Settings > Battery > Background Usage Limits > Sleeping Apps > Remove kiFOSSk.
  - Never Optimizing Apps: Settings > Battery > Background Usage Limits > Never Optimizing Apps > Add kiFOSSk.
  - Secure Folder: If you use Secure Folder, install kiFOSSk outside of it for proper boot integration.
+- **Play Protect**: May silently block installation. See [sideloading note](#option-b-sideloading-apk) above for workaround.
 
 ### Xiaomi / MIUI Users
 

@@ -15,6 +15,8 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.appcompat.app.AppCompatActivity
 
+import com.shinydiscoballsdev.kifossk.KioskPrefs
+
 @SuppressLint("SetJavaScriptEnabled")
 class MainActivity : AppCompatActivity() {
 
@@ -41,11 +43,10 @@ class MainActivity : AppCompatActivity() {
 
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
-        val prefs = getSharedPreferences("kiosk_prefs", MODE_PRIVATE)
-        val isFirstRun = prefs.getBoolean("first_run", true)
+        val isFirstRun = KioskPrefs.isFirstRun(this)
 
         if (isFirstRun) {
-            prefs.edit().putBoolean("first_run", false).commit()
+            // Don't clear first_run yet - wait until URL is validated
             startActivity(Intent(this, SettingsActivity::class.java))
             finish()
         } else {
@@ -55,11 +56,9 @@ class MainActivity : AppCompatActivity() {
 
     @SuppressLint("SetJavaScriptEnabled", "MissingPermission")
     private fun setupWebView() {
-        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
-        val prefs = getSharedPreferences("kiosk_prefs", MODE_PRIVATE)
-        val url = prefs.getString("web_url", "http://192.168.50.152:3001") ?: "http://192.168.50.152:3001"
-        val orientation = prefs.getString("orientation", "landscape") ?: "landscape"
+        val url = KioskPrefs.getUrl(this)
+        val orientation = KioskPrefs.getOrientation(this)
 
         when (orientation) {
             "landscape" -> requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
