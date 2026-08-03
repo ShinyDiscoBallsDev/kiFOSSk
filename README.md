@@ -31,7 +31,7 @@ Coming soon! Once reviewed, install directly from [F-Droid](https://f-droid.org)
 
 ### Option B: Sideloading (APK)
 
-1. Download the latest `kiFOSSk-vX.Y.Z-release.apk` from the [Releases](https://github.com/ShinyDiscoBallsDev/kiFOSSk/releases) page.
+1. Download the latest `kiFOSSk-v1.0.1-release.apk` from the [Releases](https://github.com/ShinyDiscoBallsDev/kiFOSSk/releases) page.
 2. Transfer to your device and open the APK file.
 3. Enable "Install Unknown Apps" when prompted.
 4. Tap "Install" (may show Play Protect warning — tap "Install anyway").
@@ -54,7 +54,7 @@ git clone https://github.com/ShinyDiscoBallsDev/kiFOSSk.git
 cd kiFOSSk
 ./gradlew assembleRelease
 
-APK located at: app/build/outputs/apk/release/kiFOSSk-X.Y.Z-release.apk
+APK located at: app/build/outputs/apk/release/kiFOSSk-v1.0.1-release.apk
 
 ## Configuration Guide
 
@@ -95,6 +95,18 @@ Or via phone: Settings > Apps > kiFOSSk > Uninstall. The system will prompt you 
  - Orientation: Choose Portrait, Landscape, or Auto.
  - Screen Timeout: Toggle to keep screen on while charging.
 
+## Troubleshooting
+
+### Lock Screen Appears After System Update
+
+If the lock screen shows up after a major Android OTA/system update:
+
+1. Swipe to unlock (one-time requirement after system update)
+2. Long-press to open Settings → verify Boot Autostart is enabled
+3. Reboot device — lock screen should no longer appear on subsequent boots
+
+**Note**: This is Android OS-level security behavior following system updates, not specific to kiFOSSk. It happens on all Android devices but varies by manufacturer. OnePlus/OxygenOS users report this rarely occurs; Samsung/Xiaomi users report more frequent occurrences.
+
 ## Privacy & Security
 
  - Zero Dependencies: No Google Play Services, no Firebase, no analytics SDKs.
@@ -102,6 +114,7 @@ Or via phone: Settings > Apps > kiFOSSk > Uninstall. The system will prompt you 
      - INTERNET: Required to load your dashboard.
      - ACCESS_NETWORK_STATE: To show a "Loading..." screen until connectivity is restored.
      - REQUEST_IGNORE_BATTERY_OPTIMIZATIONS: Only triggered if you enable boot autostart.
+ - URL Validation: All URLs are validated before loading — blocks malicious schemes like `javascript:`, `file://`, `intent://`, and `data:` to prevent XSS injection attacks.
  - Local Storage: All settings stored in private SharedPreferences. No cloud sync.
  - Network Isolation: Only connects to the URL you explicitly configure.
 
@@ -128,6 +141,7 @@ Verified on OxygenOS 13+ with
 - **No Developer Options** required.
 - **No additional settings** changes needed beyond initial setup.
 - **Tested after factory reset** — only required: install APK, grant permissions, set as Home Launcher.
+- **⚠️ Known Limitation**: After major Android system updates, lock screen may appear once. Normal reboots work without issue. This is an Android OS-level security measure, not a kiFOSSk bug.
 
 *Google Play Protect may warn about "unauthorized developer" when sideloading — tap "Install anyway" to proceed.*
 
