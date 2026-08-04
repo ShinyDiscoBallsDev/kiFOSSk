@@ -2,6 +2,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Android API](https://img.shields.io/badge/API-26%2B-brightgreen.svg)](https://android.googlesource.com/platform/frameworks/base/+/refs/heads/master/core/res/res/values/config.xml)
+[![F-Droid](https://img.shields.io/f-droid/v/com.shinydiscoballsdev.kifossk)](https://f-droid.org/packages/com.shinydiscoballsdev.kifossk/)
 
 **kiFOSSk** is a minimal, privacy-focused Android kiosk browser designed for displaying remote dashboards (e.g., ADS-B flight trackers, Home Assistant, Grafana) on dedicated hardware.
 
@@ -27,7 +28,7 @@ Built with zero Google Play Services dependencies, it runs natively on AOSP, Gra
 
 ### Option A: F-Droid (Recommended)
 
-Coming soon! Once reviewed, install directly from [F-Droid](https://f-droid.org).
+**Now available!** Install directly from [F-Droid](https://f-droid.org/packages/com.shinydiscoballsdev.kifossk/)! Auto-updates when new versions release.
 
 ### Option B: Sideloading (APK)
 
