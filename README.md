@@ -2,6 +2,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Android API](https://img.shields.io/badge/API-26%2B-brightgreen.svg)](https://android.googlesource.com/platform/frameworks/base/+/refs/heads/master/core/res/res/values/config.xml)
+[![F-Droid](https://img.shields.io/f-droid/v/com.shinydiscoballsdev.kifossk)](https://f-droid.org/packages/com.shinydiscoballsdev.kifossk/)
 
 **kiFOSSk** is a minimal, privacy-focused Android kiosk browser designed for displaying remote dashboards (e.g., ADS-B flight trackers, Home Assistant, Grafana) on dedicated hardware.
 
@@ -27,11 +28,11 @@ Built with zero Google Play Services dependencies, it runs natively on AOSP, Gra
 
 ### Option A: F-Droid (Recommended)
 
-Coming soon! Once reviewed, install directly from [F-Droid](https://f-droid.org).
+**Now available!** Install directly from [F-Droid](https://f-droid.org/packages/com.shinydiscoballsdev.kifossk/)! Auto-updates when new versions release.
 
 ### Option B: Sideloading (APK)
 
-1. Download the latest `kiFOSSk-v1.0.1-release.apk` from the [Releases](https://github.com/ShinyDiscoBallsDev/kiFOSSk/releases) page.
+1. Download the latest `kiFOSSk-vX.Y.Z-release.apk` from the [Releases](https://github.com/ShinyDiscoBallsDev/kiFOSSk/releases) page.
 2. Transfer to your device and open the APK file.
 3. Enable "Install Unknown Apps" when prompted.
 4. Tap "Install" (may show Play Protect warning — tap "Install anyway").
@@ -54,7 +55,7 @@ git clone https://github.com/ShinyDiscoBallsDev/kiFOSSk.git
 cd kiFOSSk
 ./gradlew assembleRelease
 
-APK located at: app/build/outputs/apk/release/kiFOSSk-v1.0.1-release.apk
+APK located at: app/build/outputs/apk/release/kiFOSSk-X.Y.Z-release.apk
 
 ## Configuration Guide
 
@@ -92,46 +93,33 @@ Or via phone: Settings > Apps > kiFOSSk > Uninstall. The system will prompt you 
 
 ### Advanced Options
 
- - Orientation: Choose Portrait, Landscape, or Auto.
- - Screen Timeout: Toggle to keep screen on while charging.
-
-## Troubleshooting
-
-### Lock Screen Appears After System Update
-
-If the lock screen shows up after a major Android OTA/system update:
-
-1. Swipe to unlock (one-time requirement after system update)
-2. Long-press to open Settings → verify Boot Autostart is enabled
-3. Reboot device — lock screen should no longer appear on subsequent boots
-
-**Note**: This is Android OS-level security behavior following system updates, not specific to kiFOSSk. It happens on all Android devices but varies by manufacturer. OnePlus/OxygenOS users report this rarely occurs; Samsung/Xiaomi users report more frequent occurrences.
+- Orientation: Choose Portrait, Landscape, or Auto.
+- Screen Timeout: Toggle to keep screen on while charging.
 
 ## Privacy & Security
 
- - Zero Dependencies: No Google Play Services, no Firebase, no analytics SDKs.
- - Minimal Permissions:
-     - INTERNET: Required to load your dashboard.
-     - ACCESS_NETWORK_STATE: To show a "Loading..." screen until connectivity is restored.
-     - REQUEST_IGNORE_BATTERY_OPTIMIZATIONS: Only triggered if you enable boot autostart.
- - URL Validation: All URLs are validated before loading — blocks malicious schemes like `javascript:`, `file://`, `intent://`, and `data:` to prevent XSS injection attacks.
- - Local Storage: All settings stored in private SharedPreferences. No cloud sync.
- - Network Isolation: Only connects to the URL you explicitly configure.
+- Zero Dependencies: No Google Play Services, no Firebase, no analytics SDKs.
+- Minimal Permissions:
+   - INTERNET: Required to load your dashboard.
+   - ACCESS_NETWORK_STATE: To show a "Loading..." screen until connectivity is restored.
+   - REQUEST_IGNORE_BATTERY_OPTIMIZATIONS: Only triggered if you enable boot autostart.
+- Local Storage: All settings stored in private SharedPreferences. No cloud sync.
+- Network Isolation: Only connects to the URL you explicitly configure.
 
 ### GrapheneOS Users
 
 This app is fully compatible with GrapheneOS.
 
- - Lockscreen: May still appear if "Hardened Mode" is enabled. Disable lockscreen or accept manual unlock.
- - Background Restrictions: Ensure "Unrestricted" battery mode is set manually.
+- Lockscreen: May still appear if "Hardened Mode" is enabled. Disable lockscreen or accept manual unlock.
+- Background Restrictions: Ensure "Unrestricted" battery mode is set manually.
 
 ### Stock Android / Pixel Users
 
 Most stock Android devices are well-supported out of the box.
 
- - Adaptive Battery: May need to exempt kiFOSSk from Adaptive Battery restrictions (Settings > Battery > Adaptive Preferences > Exempt apps).
- - Doze Mode: Kick the device awake after heavy idle periods — kiosk mode should prevent this automatically.
- - App Standby Buckets: Keep kiFOSSk in the "Active" bucket by using it regularly.
+- Adaptive Battery: May need to exempt kiFOSSk from Adaptive Battery restrictions (Settings > Battery > Adaptive Preferences > Exempt apps).
+- Doze Mode: Kick the device awake after heavy idle periods — kiosk mode should prevent this automatically.
+- App Standby Buckets: Keep kiFOSSk in the "Active" bucket by using it regularly.
 
 ### OnePlus / OxygenOS Users
 
@@ -141,7 +129,6 @@ Verified on OxygenOS 13+ with
 - **No Developer Options** required.
 - **No additional settings** changes needed beyond initial setup.
 - **Tested after factory reset** — only required: install APK, grant permissions, set as Home Launcher.
-- **⚠️ Known Limitation**: After major Android system updates, lock screen may appear once. Normal reboots work without issue. This is an Android OS-level security measure, not a kiFOSSk bug.
 
 *Google Play Protect may warn about "unauthorized developer" when sideloading — tap "Install anyway" to proceed.*
 
@@ -149,25 +136,25 @@ Verified on OxygenOS 13+ with
 
 Samsung's One UI has the most aggressive background restrictions.
 
- - Put Apps to Sleep: Settings > Battery > Background Usage Limits > Sleeping Apps > Remove kiFOSSk.
- - Never Optimizing Apps: Settings > Battery > Background Usage Limits > Never Optimizing Apps > Add kiFOSSk.
- - Secure Folder: If you use Secure Folder, install kiFOSSk outside of it for proper boot integration.
+- Put Apps to Sleep: Settings > Battery > Background Usage Limits > Sleeping Apps > Remove kiFOSSk.
+- Never Optimizing Apps: Settings > Battery > Background Usage Limits > Never Optimizing Apps > Add kiFOSSk.
+- Secure Folder: If you use Secure Folder, install kiFOSSk outside of it for proper boot integration.
 - **Play Protect**: May silently block installation. See [sideloading note](#option-b-sideloading-apk) above for workaround.
 
 ### Xiaomi / MIUI Users
 
 MIUI is notorious for killing background apps.
 
- - Autostart: Settings > Apps > Permissions > Autostart > Enable for kiFOSSk.
- - Battery Saver: Settings > Apps > Manage Apps > kiFOSSk > Battery Saver > No restrictions.
- - Security App: Open the Security app > Battery > App Battery Saver > kiFOSSk > No restrictions.
+- Autostart: Settings > Apps > Permissions > Autostart > Enable for kiFOSSk.
+- Battery Saver: Settings > Apps > Manage Apps > kiFOSSk > Battery Saver > No restrictions.
+- Security App: Open the Security app > Battery > App Battery Saver > kiFOSSk > No restrictions.
 
 ### Custom ROMs (LineageOS, etc.)
 
 Generally work well, but check your specific ROM's power management settings.
 
- - Battery Optimization: Look for equivalent "Ignore optimizations" or "Unrestricted" settings.
- - SELinux: If building from source, ensure SELinux is permissive or properly configured for your ROM.
+- Battery Optimization: Look for equivalent "Ignore optimizations" or "Unrestricted" settings.
+- SELinux: If building from source, ensure SELinux is permissive or properly configured for your ROM.
 
 ### Universal Tips for All Devices
 
