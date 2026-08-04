@@ -129,6 +129,7 @@ Verified on OxygenOS 13+ with
 - **No Developer Options** required.
 - **No additional settings** changes needed beyond initial setup.
 - **Tested after factory reset** — only required: install APK, grant permissions, set as Home Launcher.
+- **⚠️ Known Limitation**: After major Android system updates, lock screen may appear once. Normal reboots work without issue. This is an Android OS-level security measure, not a kiFOSSk bug.
 
 *Google Play Protect may warn about "unauthorized developer" when sideloading — tap "Install anyway" to proceed.*
 
