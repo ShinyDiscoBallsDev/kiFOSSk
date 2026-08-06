@@ -19,3 +19,6 @@ Thumbs.db
 app/src/test/
 app/src/androidTest/
 *.test.local.properties
+
+# Experimental / dead code
+**/DeviceAdminReceiver.kt
