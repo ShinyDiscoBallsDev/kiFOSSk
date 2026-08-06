@@ -54,10 +54,9 @@ object NetworkRetryHelper {
         return "<html><head><style>" +
                 "body{background-color:#1a1a2e;color:#6d4aff;text-align:center;" +
                 "font-family:sans-serif;padding-top:35%;margin:0;}" +
-                "h2{font-size:28px;}" +
-                "</style></head><body>" +
+                "h2{font-size:28px;}</style></head><body>" +
                 "<h2>Loading...</h2>" +
-                "<p style=\"color:#888;font-size:14px;\">Connecting to network</p>" +
+                "<p style=\"color:#888;font-size:14px;\">Connecting to $targetUrl</p>" +
                 "</body></html>"
     }
 }

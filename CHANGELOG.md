@@ -2,15 +2,28 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.2] - 2026-08
 
-### v1.0.1 (August 2026)
+### Fixed
+- **Critical**: Integrated `NetworkRetryHelper.startWaitingForNetwork()` with exponential backoff and MAX_RETRIES=10 (fixes infinite retry loop battery drain vulnerability)
+- **Hardening**: Gesture restricted to bottom-right corner zone (±80px) to reduce accidental triggers
+- **Hardening**: Added 10-second cooldown after settings access to prevent rapid-fire opening
+- **Hardening**: Removed unused legacy fields (`lastTouchX`, `lastTouchY`)
+- **Fix**: WebView state preserved across screen rotation via `onSaveInstanceState`/`onRestoreInstanceState`
+- **Fix**: Settings spinner now syncs to saved orientation preference (prevents silent revert to landscape)
+- **Cleanup**: Added `NetworkRetryHelper.stopWaiting()` in `onDestroy()` to cancel pending network jobs
+- **Code Hygiene**: `DeviceAdminReceiver.kt` added to `.gitignore` (unimplemented skeleton code)
+
+## [1.0.1] - 2026-08
+
+### Fixed
 - **Security**: Added URL validation to block malicious schemes (`javascript:`, `file:`, `intent:`, etc.)
 - **Bug Fix**: Empty URL in settings now falls back to safe default instead of loading blank
 - **Bug Fix**: Fixed first-run race condition — Settings clears only after URL is validated and saved
 - **Bug Fix**: Network retry limit prevents infinite battery drain during offline periods
 - **Known Issue**: Lock screen may appear after Android system updates (not on normal reboots)
 
-## [1.0.0] - July 2026
+## [1.0.0] - 2026-07
 
 ### Added
 - Initial public release of kiFOSSk.

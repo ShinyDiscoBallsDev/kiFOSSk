@@ -3,19 +3,33 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Android API](https://img.shields.io/badge/API-26%2B-brightgreen.svg)](https://android.googlesource.com/platform/frameworks/base/+/refs/heads/master/core/res/res/values/config.xml)
 [![F-Droid](https://img.shields.io/f-droid/v/com.shinydiscoballsdev.kifossk)](https://f-droid.org/packages/com.shinydiscoballsdev.kifossk/)
+[![GitHub Stars](https://img.shields.io/github/stars/ShinyDiscoBallsDev/kiFOSSk)](https://github.com/ShinyDiscoBallsDev/kiFOSSk)
 
 **kiFOSSk** is a minimal, privacy-focused Android kiosk browser designed for displaying remote dashboards (e.g., ADS-B flight trackers, Home Assistant, Grafana) on dedicated hardware.
 
 Built with zero Google Play Services dependencies, it runs natively on AOSP, GrapheneOS, and standard Android devices. Perfect for turning old phones into always-on informational displays.
+
+## 🚀 Latest Release: v1.0.2 (August 2026)
+
+**What's New:**
+- Network retry with exponential backoff (battery drain fix)
+- Gesture hardening (corner-only access + 10s cooldown)
+- Rotation state preservation for "auto" orientation mode
+- Settings spinner now syncs to saved orientation preference
+
+[Full Changelog →](CHANGELOG.md) | [Download APK](https://github.com/ShinyDiscoBallsDev/kiFOSSk/releases) | [F-Droid](https://f-droid.org/packages/com.shinydiscoballsdev.kifossk/)
 
 ## Features
 
 - **Home Launcher Mode**: Automatically launches on boot without needing Device Owner privileges.
 - **Lockscreen Bypass**: Uses `setShowWhenLocked()` to skip the lock screen on startup.
 - **WebView Kiosk**: Fullscreen immersive mode, back button disabled, long-press to access settings.
+- **Gesture Protection**: Long-press restricted to bottom-right corner zone (±80px) with 10-second cooldown to prevent accidental triggers.
+- **Network Resilience**: Automatic retry with exponential backoff (max 10 attempts) when offline — no infinite loops or battery drain.
 - **Battery Optimization**: Includes a one-click dialog to request "Unrestricted" battery usage.
 - **Customizable**: Set dashboard URL, screen timeout, orientation (portrait/landscape/auto), and boot autostart.
 - **Privacy First**: No analytics, no telemetry, no internet permissions beyond your configured URL.
+- **URL Sanitization**: Only `http`/`https` schemes allowed — blocks `javascript:`, `file:`, `intent:`, `content:`, `data:` redirects.
 
 ## Use Cases
 
@@ -61,18 +75,20 @@ APK located at: app/build/outputs/apk/release/kiFOSSk-X.Y.Z-release.apk
 
 ### First-Time Setup
 
-1. Open Settings: Long-press any corner of the screen for 2 seconds.
+1. Open Settings: Long-press the **bottom-right corner** of the screen for 2 seconds.
 2. Enter URL: Input your dashboard address (e.g., http://192.168.50.152:3001).
 3. Enable Boot Autostart: Toggle the switch ON.
 4. Battery Exemption: Tap "Request Unrestricted Battery" and confirm in system settings.
 5. Set as Home App: Tap "Set as Home Launcher" and select "Always".
 6. Reboot: The app should launch automatically on boot.
 
+**Note**: Settings access is restricted to the bottom-right corner zone with a 10-second cooldown between accesses to prevent accidental triggers during device movement.
+
 ### Temporarily Accessing Other Apps
 
 If kiFOSSk is set as your default home launcher and you need to use other apps:
 
-1. Long-press to open Settings
+1. Long-press the bottom-right corner to open Settings
 2. Tap "Switch to Different Launcher"
 3. Select "System Launcher" or your preferred home screen
 4. Swipe through the lockscreen (normal behavior resumes without kiFOSSk as home)
@@ -93,18 +109,21 @@ Or via phone: Settings > Apps > kiFOSSk > Uninstall. The system will prompt you 
 
 ### Advanced Options
 
-- Orientation: Choose Portrait, Landscape, or Auto.
+- Orientation: Choose Portrait, Landscape, or Auto (state preserved across rotation).
 - Screen Timeout: Toggle to keep screen on while charging.
 
 ## Privacy & Security
 
-- Zero Dependencies: No Google Play Services, no Firebase, no analytics SDKs.
-- Minimal Permissions:
-   - INTERNET: Required to load your dashboard.
-   - ACCESS_NETWORK_STATE: To show a "Loading..." screen until connectivity is restored.
-   - REQUEST_IGNORE_BATTERY_OPTIMIZATIONS: Only triggered if you enable boot autostart.
-- Local Storage: All settings stored in private SharedPreferences. No cloud sync.
-- Network Isolation: Only connects to the URL you explicitly configure.
+### Security Model
+
+- **URL Sanitization**: `UrlValidator.kt` blocks all non-HTTP(S) schemes (`javascript:`, `file:`, `intent:`, `content:`, `data:`).
+- **Gesture Protection**: Bottom-right corner zone (±80px) + 10s cooldown prevents accidental settings access.
+- **Network Safety**: Coroutine-based retry with `MAX_RETRIES=10` and exponential backoff — no infinite loops.
+- **Minimal Permissions**: Only `INTERNET`, `ACCESS_NETWORK_STATE`, `REQUEST_IGNORE_BATTERY_OPTIMIZATIONS`.
+- **No Background Services**: All logic runs in the foreground Activity.
+- **Local Storage Only**: All settings stored in private SharedPreferences. No cloud sync.
+- **Zero Dependencies**: No Google Play Services, no Firebase, no analytics SDKs.
+- **Network Isolation**: Only connects to the URL you explicitly configure.
 
 ### GrapheneOS Users
 
@@ -167,8 +186,14 @@ If boot autostart fails after initial setup:
 4. Restart Test: Reboot the device twice to ensure settings persist through boot cycles.
 5. Logcat Debugging: Use adb logcat | findstr "kifossk" to identify any startup errors.
 
+## Known Issues
 
-### Contributing
+| Issue | Severity | Workaround |
+|-------|----------|------------|
+| Lock screen may appear after Android system updates (not on normal reboots) | Low | Unlock and reopen app |
+| Gesture/WebView long-press conflict (text selection may trigger) | Low | Avoid long-pressing on WebView content |
+
+## Contributing
 
 Contributions are welcome! Whether it's bug fixes, new features, or documentation improvements:
 
@@ -177,3 +202,13 @@ Contributions are welcome! Whether it's bug fixes, new features, or documentatio
 3. Commit your changes (git commit -m 'Add amazing feature').
 4. Push to the branch (git push origin feature/amazing-feature).
 5. Open a Pull Request.
+
+---
+
+## 📄 License
+
+MIT License — see [LICENSE](LICENSE) for details.
+
+---
+
+Created by **ShinyDiscoBallsDev**

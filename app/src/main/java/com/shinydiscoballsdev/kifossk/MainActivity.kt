@@ -5,8 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.net.ConnectivityManager
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
@@ -22,8 +20,11 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var webView: WebView
     private lateinit var gestureDetector: GestureDetector
-    private var lastTouchX = 0f
-    private var lastTouchY = 0f
+
+    // Gesture hardening fields
+    private var lastSettingsOpenTime = 0L
+    private val SETTINGS_COOLDOWN_MS = 10_000L  // 10 seconds
+    private val GESTURE_ZONE_SIZE_PX = 80f     // ~80px corner zone
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -83,7 +84,22 @@ class MainActivity : AppCompatActivity() {
         // Gesture detector - pass this directly
         gestureDetector = GestureDetector(this, object : GestureDetector.SimpleOnGestureListener() {
             override fun onLongPress(e: MotionEvent) {
-                startActivity(Intent(this@MainActivity, SettingsActivity::class.java))
+                val now = System.currentTimeMillis()
+
+                // Debounce: minimum 10 seconds between setting accesses
+                if (now - lastSettingsOpenTime < SETTINGS_COOLDOWN_MS) return
+
+                // Restrict to bottom-right corner zone (~80px area)
+                val displayMetrics = resources.displayMetrics
+                val screenWidth = displayMetrics.widthPixels.toFloat()
+                val screenHeight = displayMetrics.heightPixels.toFloat()
+
+                if (e.rawX > screenWidth - GESTURE_ZONE_SIZE_PX &&
+                    e.rawY > screenHeight - GESTURE_ZONE_SIZE_PX) {
+
+                    lastSettingsOpenTime = now
+                    startActivity(Intent(this@MainActivity, SettingsActivity::class.java))
+                }
             }
         })
 
@@ -134,34 +150,24 @@ class MainActivity : AppCompatActivity() {
         // Do nothing
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        NetworkRetryHelper.stopWaiting()
+    }
+
     @SuppressLint("SetTextI18n")
     private fun loadWaitingPage(targetUrl: String) {
-        val waitingHtml = "<html><head><style>" +
-                "body{background-color:#1a1a2e;color:#6d4aff;text-align:center;" +
-                "font-family:sans-serif;padding-top:35%;margin:0;}" +
-                "h2{font-size:28px;}" +
-                "</style></head><body>" +
-                "<h2>Loading...</h2>" +
-                "<p style=\"color:#888;font-size:14px;\">Connecting to network</p>" +
-                "</body></html>"
+        val waitingHtml = NetworkRetryHelper.createWaitingPage(targetUrl)
 
         webView.setBackgroundColor(android.graphics.Color.parseColor("#1a1a2e"))
         webView.loadDataWithBaseURL(null, waitingHtml, "text/html", "UTF-8", null)
 
-        Handler(Looper.getMainLooper()).postDelayed({
-            val isConnected = try {
-                val cm = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-                @Suppress("DEPRECATION")
-                cm.activeNetworkInfo?.isConnected == true
-            } catch (e: Exception) {
-                false
+        NetworkRetryHelper.startWaitingForNetwork(
+            context = this,
+            targetUrl = targetUrl,
+            onConnected = { url ->
+                webView.loadUrl(url)
             }
-
-            if (isConnected) {
-                webView.loadUrl(targetUrl)
-            } else {
-                loadWaitingPage(targetUrl)
-            }
-        }, 3000)
+        )
     }
 }

@@ -67,6 +67,11 @@ class SettingsActivity : AppCompatActivity() {
         ).also { adapter ->
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             spinnerOrientation.adapter = adapter
+
+            // Sync spinner to saved orientation
+            val savedOrientation = KioskPrefs.getOrientation(this)
+            val orientationMap = mapOf("landscape" to 0, "portrait" to 1, "auto" to 2)
+            spinnerOrientation.setSelection(orientationMap[savedOrientation] ?: 0)
         }
 
         // Check launcher status on load
