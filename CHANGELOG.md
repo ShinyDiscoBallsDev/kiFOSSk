@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.3] - 2026-08
+
+### Fixed
+- **Fix**: Disabled WebView native long-press context menu via `setOnLongClickListener { true }` — gesture detection now has exclusive ownership of long-press events (resolves root cause of gesture/WebView conflict originally documented in v1.0.1)
+- **Hardening**: Injected CSS `webkitUserSelect: none` on page load to prevent text selection highlighting in kiosk mode
+
+### Added
+- **Feature**: Optional auto-refresh with configurable interval (10s, 30s, 1min, 5min, 15min)
+- **Settings**: Auto-refresh toggle and interval spinner in SettingsActivity
+- **Behavior**: Auto-refresh pauses on app background (`onPause`) to preserve battery
+- **Behavior**: Auto-refresh resumes on page load via `onPageFinished()`
+
 ## [1.0.2] - 2026-08
 
 ### Fixed

@@ -90,6 +90,42 @@
             android:layout_height="wrap_content"
             android:minHeight="48dp"
             android:entries="@array/orientation_options"/>
+
+		<!-- Auto-Refresh -->
+		<TextView
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:text="Auto-Refresh"
+			android:textSize="16sp"
+			android:textColor="?android:attr/textColorSecondary"
+			android:layout_marginTop="24dp"
+			android:layout_marginBottom="8dp"/>
+
+		<androidx.appcompat.widget.SwitchCompat
+			android:id="@+id/switchAutoRefresh"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:checked="false"
+			android:text="Enable automatic page reload"
+			android:layout_marginBottom="8dp"/>
+
+		<TextView
+			android:id="@+id/textRefreshIntervalLabel"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:text="Refresh Interval"
+			android:textSize="16sp"
+			android:textColor="?android:attr/textColorSecondary"
+			android:layout_marginTop="8dp"
+			android:layout_marginBottom="8dp"/>
+
+		<Spinner
+			android:id="@+id/spinnerRefreshInterval"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:minHeight="48dp"
+			android:entries="@array/refresh_intervals"
+			android:enabled="false"/>
 		
 		<TextView
 			android:id="@+id/textLauncherStatus"
