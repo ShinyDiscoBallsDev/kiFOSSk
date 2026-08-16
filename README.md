@@ -4,30 +4,32 @@
 [![Android API](https://img.shields.io/badge/API-26%2B-brightgreen.svg)](https://android.googlesource.com/platform/frameworks/base/+/refs/heads/master/core/res/res/values/config.xml)
 [![F-Droid](https://img.shields.io/f-droid/v/com.shinydiscoballsdev.kifossk)](https://f-droid.org/packages/com.shinydiscoballsdev.kifossk/)
 [![GitHub Stars](https://img.shields.io/github/stars/ShinyDiscoBallsDev/kiFOSSk)](https://github.com/ShinyDiscoBallsDev/kiFOSSk)
+[![Ko-fi](https://img.shields.io/badge/Ko--fi-Support-FF5E5B?logo=ko-fi&logoColor=white)](https://ko-fi.com/shinydiscoballsdev)
 
 **kiFOSSk** is a minimal, privacy-focused Android kiosk browser designed for displaying remote dashboards (e.g., ADS-B flight trackers, Home Assistant, Grafana) on dedicated hardware.
 
 Built with zero Google Play Services dependencies, it runs natively on AOSP, GrapheneOS, and standard Android devices. Perfect for turning old phones into always-on informational displays.
 
-## 🚀 Latest Release: v1.0.2 (August 2026)
+## 🚀 Latest Release: v1.0.3 (August 2026)
 
 **What's New:**
-- Network retry with exponential backoff (battery drain fix)
-- Gesture hardening (corner-only access + 10s cooldown)
-- Rotation state preservation for "auto" orientation mode
-- Settings spinner now syncs to saved orientation preference
+- Full gesture conflict fix — WebView long-press context menu completely disabled
+- CSS injection prevents text selection highlighting in kiosk mode
+- Optional auto-refresh with configurable interval (10s–15min presets)
+- Auto-refresh pauses on background to preserve battery
 
-[Full Changelog →](CHANGELOG.md) | [Download APK](https://github.com/ShinyDiscoBallsDev/kiFOSSk/releases) | [F-Droid](https://f-droid.org/packages/com.shinydiscoballsdev.kifossk/)
+[Full Changelog →](CHANGELOG.md) | [Download APK](https://github.com/ShinyDiscoBallsDev/kiFOSSk/releases) | [F-Droid](https://f-droid.org/packages/com.shinydiscoballsdev.kifossk/) | [☕ Ko-fi](https://ko-fi.com/shinydiscoballsdev)
 
 ## Features
 
 - **Home Launcher Mode**: Automatically launches on boot without needing Device Owner privileges.
 - **Lockscreen Bypass**: Uses `setShowWhenLocked()` to skip the lock screen on startup.
 - **WebView Kiosk**: Fullscreen immersive mode, back button disabled, long-press to access settings.
-- **Gesture Protection**: Long-press restricted to bottom-right corner zone (±80px) with 10-second cooldown to prevent accidental triggers.
+- **Gesture Protection**: Long-press restricted to bottom-right corner zone (±80px) with 10-second cooldown to prevent accidental triggers. WebView native context menu fully disabled — no text selection, no "Copy/Share" popups.
+- **Auto-Refresh**: Optional automatic page reload with configurable intervals (10s, 30s, 1min, 5min, 15min). Pauses when app is backgrounded to save battery.
 - **Network Resilience**: Automatic retry with exponential backoff (max 10 attempts) when offline — no infinite loops or battery drain.
 - **Battery Optimization**: Includes a one-click dialog to request "Unrestricted" battery usage.
-- **Customizable**: Set dashboard URL, screen timeout, orientation (portrait/landscape/auto), and boot autostart.
+- **Customizable**: Set dashboard URL, screen timeout, orientation (portrait/landscape/auto), boot autostart, and auto-refresh interval.
 - **Privacy First**: No analytics, no telemetry, no internet permissions beyond your configured URL.
 - **URL Sanitization**: Only `http`/`https` schemes allowed — blocks `javascript:`, `file:`, `intent:`, `content:`, `data:` redirects.
 
@@ -84,6 +86,17 @@ APK located at: app/build/outputs/apk/release/kiFOSSk-X.Y.Z-release.apk
 
 **Note**: Settings access is restricted to the bottom-right corner zone with a 10-second cooldown between accesses to prevent accidental triggers during device movement.
 
+### Auto-Refresh Setup
+
+If your dashboard doesn't auto-refresh server-side:
+
+1. Long-press the bottom-right corner to open Settings
+2. Toggle "Enable automatic page reload" ON
+3. Select your desired interval (10s–15min)
+4. Tap "Save & Launch"
+
+Auto-refresh automatically pauses when the app is backgrounded and resumes when the page reloads. This prevents unnecessary battery drain when nobody is viewing the display.
+
 ### Temporarily Accessing Other Apps
 
 If kiFOSSk is set as your default home launcher and you need to use other apps:
@@ -111,19 +124,37 @@ Or via phone: Settings > Apps > kiFOSSk > Uninstall. The system will prompt you 
 
 - Orientation: Choose Portrait, Landscape, or Auto (state preserved across rotation).
 - Screen Timeout: Toggle to keep screen on while charging.
+- Auto-Refresh: Enable/disable with configurable interval (10s–15min).
 
 ## Privacy & Security
 
 ### Security Model
 
+kiFOSSk was built with a **minimal attack surface** philosophy. Every permission, dependency, and background process was scrutinized — if it wasn't strictly necessary for a kiosk browser, it was cut.
+
 - **URL Sanitization**: `UrlValidator.kt` blocks all non-HTTP(S) schemes (`javascript:`, `file:`, `intent:`, `content:`, `data:`).
-- **Gesture Protection**: Bottom-right corner zone (±80px) + 10s cooldown prevents accidental settings access.
+- **Gesture Protection**: Bottom-right corner zone (±80px) + 10s cooldown prevents accidental settings access. WebView native long-press context menu fully disabled — no text selection, no "Copy/Share" popups.
+- **CSS Hardening**: `user-select: none` injected on page load to prevent text selection highlighting.
 - **Network Safety**: Coroutine-based retry with `MAX_RETRIES=10` and exponential backoff — no infinite loops.
-- **Minimal Permissions**: Only `INTERNET`, `ACCESS_NETWORK_STATE`, `REQUEST_IGNORE_BATTERY_OPTIMIZATIONS`.
-- **No Background Services**: All logic runs in the foreground Activity.
+- **Minimal Permissions**: Only `INTERNET`, `ACCESS_NETWORK_STATE`, `REQUEST_IGNORE_BATTERY_OPTIMIZATIONS`. That's it.
+- **No Background Services**: All logic runs in the foreground Activity. No foreground service, no background workers.
 - **Local Storage Only**: All settings stored in private SharedPreferences. No cloud sync.
 - **Zero Dependencies**: No Google Play Services, no Firebase, no analytics SDKs.
 - **Network Isolation**: Only connects to the URL you explicitly configure.
+
+### Scope and Permissions
+
+kiFOSSk is purpose-built as a **simple kiosk browser** — nothing more, nothing less. Because the scope is intentionally narrow, the permission footprint is minimal:
+
+| Permission                             | Why kiFOSSk Needs It                                 |
+|----------------------------------------|------------------------------------------------------|
+| `INTERNET`                             | Fetch your dashboard URL                             |
+| `ACCESS_NETWORK_STATE`                 | Detect connectivity for retry logic                  |
+| `REQUEST_IGNORE_BATTERY_OPTIMIZATIONS` | Allow always-on display without Doze killing the app |
+
+**3 permissions. No location tracking. No camera access. No NFC. No notification spam. No background services.**
+
+For users who prioritize simplicity, privacy, and transparency over feature breadth, kiFOSSk provides a focused solution that does one thing well.
 
 ### GrapheneOS Users
 
@@ -188,10 +219,9 @@ If boot autostart fails after initial setup:
 
 ## Known Issues
 
-| Issue | Severity | Workaround |
-|-------|----------|------------|
-| Lock screen may appear after Android system updates (not on normal reboots) | Low | Unlock and reopen app |
-| Gesture/WebView long-press conflict (text selection may trigger) | Low | Avoid long-pressing on WebView content |
+| Issue                                                                       | Severity | Workaround            |
+|-----------------------------------------------------------------------------|----------|-----------------------|
+| Lock screen may appear after Android system updates (not on normal reboots) | Low      | Unlock and reopen app |
 
 ## Contributing
 
@@ -202,6 +232,16 @@ Contributions are welcome! Whether it's bug fixes, new features, or documentatio
 3. Commit your changes (git commit -m 'Add amazing feature').
 4. Push to the branch (git push origin feature/amazing-feature).
 5. Open a Pull Request.
+
+---
+
+## ☕ Support kiFOSSk
+
+If kiFOSSk has been useful, consider buying me a coffee:
+
+[![Ko-fi](https://img.shields.io/badge/Ko--fi-Support-FF5E5B?logo=ko-fi&logoColor=white)](https://ko-fi.com/shinydiscoballsdev)
+
+kiFOSSk is and always will be free and open source. Donations help cover development time and device testing.
 
 ---
 

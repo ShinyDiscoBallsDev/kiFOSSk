@@ -24,6 +24,9 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var switchScreenOn: SwitchCompat
     private lateinit var switchBootAutostart: SwitchCompat
     private lateinit var spinnerOrientation: Spinner
+    private lateinit var switchAutoRefresh: SwitchCompat
+    private lateinit var spinnerRefreshInterval: Spinner
+    private lateinit var textRefreshIntervalLabel: TextView
     private lateinit var btnSave: Button
     private lateinit var btnSetLauncher: Button
     private lateinit var textLauncherStatus: TextView
@@ -43,6 +46,9 @@ class SettingsActivity : AppCompatActivity() {
         switchScreenOn = findViewById(R.id.switchScreenOn)
         switchBootAutostart = findViewById(R.id.switchBootAutostart)
         spinnerOrientation = findViewById(R.id.spinnerOrientation)
+        switchAutoRefresh = findViewById(R.id.switchAutoRefresh)
+        spinnerRefreshInterval = findViewById(R.id.spinnerRefreshInterval)
+        textRefreshIntervalLabel = findViewById(R.id.textRefreshIntervalLabel)
         btnSave = findViewById(R.id.buttonSave)
         btnSetLauncher = findViewById(R.id.buttonSetLauncher)
         textLauncherStatus = findViewById(R.id.textLauncherStatus)
@@ -74,8 +80,21 @@ class SettingsActivity : AppCompatActivity() {
             spinnerOrientation.setSelection(orientationMap[savedOrientation] ?: 0)
         }
 
+        // Auto-refresh toggle and interval
+        switchAutoRefresh.isChecked = KioskPrefs.isAutoRefreshEnabled(this)
+        val currentInterval = KioskPrefs.getAutoRefreshInterval(this)
+        val intervalValues = intArrayOf(10, 30, 60, 300, 900)
+        val intervalIndex = intervalValues.indexOf(currentInterval)
+        spinnerRefreshInterval.setSelection(if (intervalIndex >= 0) intervalIndex else 1)
+        updateRefreshIntervalSpinnerState()
+
+        switchAutoRefresh.setOnCheckedChangeListener { _, isChecked ->
+            updateRefreshIntervalSpinnerState()
+        }
+
         // Check launcher status on load
         updateLauncherStatus()
+
 
         // Set as Launcher button handler
         btnSetLauncher.setOnClickListener {
@@ -86,6 +105,12 @@ class SettingsActivity : AppCompatActivity() {
         btnSave.setOnClickListener {
             saveAndReturn()
         }
+    }
+
+    private fun updateRefreshIntervalSpinnerState() {
+        val isEnabled = switchAutoRefresh.isChecked
+        spinnerRefreshInterval.isEnabled = isEnabled
+        textRefreshIntervalLabel.isEnabled = isEnabled
     }
 
     override fun onResume() {
@@ -104,7 +129,10 @@ class SettingsActivity : AppCompatActivity() {
             .putString("web_url", editTextUrl.text.toString())
             .putBoolean("screen_on", switchScreenOn.isChecked)
             .putBoolean("boot_autostart", switchBootAutostart.isChecked)
+            .putBoolean("auto_refresh_enabled", switchAutoRefresh.isChecked)
+            .putInt("auto_refresh_interval", intArrayOf(10, 30, 60, 300, 900)[spinnerRefreshInterval.selectedItemPosition])
             .commit()
+
 
         Toast.makeText(this, "Settings saved! Opening launcher selection...", Toast.LENGTH_SHORT).show()
 
@@ -157,6 +185,12 @@ class SettingsActivity : AppCompatActivity() {
         val orientationIndex = spinnerOrientation.selectedItemPosition
         val orientationMap = mapOf(0 to "landscape", 1 to "portrait", 2 to "auto")
         editor.putString("orientation", orientationMap[orientationIndex])
+        val refreshIntervalValues = intArrayOf(10, 30, 60, 300, 900)
+        KioskPrefs.setAutoRefresh(
+            this,
+            switchAutoRefresh.isChecked,
+            refreshIntervalValues[spinnerRefreshInterval.selectedItemPosition]
+        )
         editor.commit()
     }
 
@@ -176,6 +210,14 @@ class SettingsActivity : AppCompatActivity() {
             2 to "auto"
         )
         editor.putString("orientation", orientationMap[orientationIndex])
+
+        // Auto-refresh settings
+        val intervalValues = intArrayOf(10, 30, 60, 300, 900)
+        KioskPrefs.setAutoRefresh(
+            this,
+            switchAutoRefresh.isChecked,
+            intervalValues[spinnerRefreshInterval.selectedItemPosition]
+        )
 
 // FIX Bug #4: Clear first_run only after URL is validated and saved
         editor.putBoolean("first_run", false)

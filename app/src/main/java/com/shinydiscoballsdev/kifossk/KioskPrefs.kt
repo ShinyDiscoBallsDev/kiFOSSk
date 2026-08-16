@@ -43,4 +43,19 @@ object KioskPrefs {
     fun setOrientation(context: Context, orientation: String) {
         getInstance(context).edit().putString("orientation", orientation).commit()
     }
+
+    fun isAutoRefreshEnabled(context: Context): Boolean {
+        return getInstance(context).getBoolean("auto_refresh_enabled", false)
+    }
+
+    fun getAutoRefreshInterval(context: Context): Int {
+        return getInstance(context).getInt("auto_refresh_interval", 30)
+    }
+
+    fun setAutoRefresh(context: Context, enabled: Boolean, intervalSeconds: Int) {
+        getInstance(context).edit()
+            .putBoolean("auto_refresh_enabled", enabled)
+            .putInt("auto_refresh_interval", intervalSeconds)
+            .apply()
+    }
 }

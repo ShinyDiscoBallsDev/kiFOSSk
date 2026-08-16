@@ -5,6 +5,8 @@ import android.content.Context
 import android.content.Intent
 import android.net.ConnectivityManager
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
@@ -20,6 +22,8 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var webView: WebView
     private lateinit var gestureDetector: GestureDetector
+    private var refreshHandler: Handler? = null
+    private var refreshRunnable: Runnable? = null
 
     // Gesture hardening fields
     private var lastSettingsOpenTime = 0L
@@ -78,7 +82,19 @@ class MainActivity : AppCompatActivity() {
             useWideViewPort = true
             loadWithOverviewMode = true
         }
-        webView.webViewClient = WebViewClient()
+        webView.setOnLongClickListener { true }
+        webView.webViewClient = object : WebViewClient() {
+            override fun onPageFinished(view: WebView, url: String) {
+                view.evaluateJavascript(
+                    "document.documentElement.style.webkitUserSelect = 'none';" +
+                            "document.documentElement.style.userSelect = 'none';",
+                    null
+                )
+
+                // Auto-refresh setup (runs on every page load)
+                setupAutoRefresh(url)
+            }
+        }
         setContentView(webView)
 
         // Gesture detector - pass this directly
@@ -131,6 +147,45 @@ class MainActivity : AppCompatActivity() {
                 )
     }
 
+    // ─── AUTO-REFRESH LOGIC ─────────────────────────────────────────────
+    private fun setupAutoRefresh(currentUrl: String) {
+        // Stop any existing refresh loop first
+        stopAutoRefresh()
+
+        if (!KioskPrefs.isAutoRefreshEnabled(this)) return
+
+        val intervalSeconds = KioskPrefs.getAutoRefreshInterval(this)
+        val intervalMs = intervalSeconds * 1000L
+
+        refreshHandler = Handler(Looper.getMainLooper())
+        refreshRunnable = object : Runnable {
+            override fun run() {
+                if (KioskPrefs.isAutoRefreshEnabled(this@MainActivity)) {
+                    webView.loadUrl(currentUrl) // Reload current URL
+                    setupAutoRefresh(currentUrl) // Re-schedule (recursive)
+                }
+            }
+        }
+
+        refreshHandler?.postDelayed(refreshRunnable!!, intervalMs)
+    }
+
+    private fun stopAutoRefresh() {
+        refreshRunnable?.let { refreshHandler?.removeCallbacks(it) }
+        refreshHandler = null
+        refreshRunnable = null
+    }
+
+    override fun onPause() {
+        stopAutoRefresh()
+        super.onPause()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Refresh loop resumes in onPageFinished() after page loads
+    }
+
     override fun dispatchTouchEvent(event: MotionEvent?): Boolean {
         if (event != null) {
             gestureDetector.onTouchEvent(event)
@@ -151,8 +206,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
-        super.onDestroy()
+        stopAutoRefresh()
         NetworkRetryHelper.stopWaiting()
+        super.onDestroy()
     }
 
     @SuppressLint("SetTextI18n")
