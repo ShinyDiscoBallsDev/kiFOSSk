@@ -44,7 +44,7 @@ jobs:
           languages: ${{ matrix.language }}
 
       - name: Build project
-        run: gradle assembleDebug --no-daemon
+        run: gradle assembleDebug --no-daemon --no-configuration-cache
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
